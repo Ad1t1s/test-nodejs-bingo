@@ -18,6 +18,17 @@
       th, td {
         padding: 15px;
       }
+
+      .btn:hover {
+        background: #2079b0;
+        background-image: -webkit-linear-gradient(top, #2079b0, #eb94d0);
+        background-image: -moz-linear-gradient(top, #2079b0, #eb94d0);
+        background-image: -ms-linear-gradient(top, #2079b0, #eb94d0);
+        background-image: -o-linear-gradient(top, #2079b0, #eb94d0);
+        background-image: linear-gradient(to bottom, #2079b0, #eb94d0);
+        text-decoration: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <script src="/socket.io/socket.io.js"></script>
@@ -27,26 +38,61 @@
         divCode = document.getElementById(div1).innerHTML;
         return divCode; };
 
+        function newGames() {
+          let socket = io();
+          socket.emit('chat message', 'NEWGAME');
+        }
+        function newNumbers() {
+          let socket = io();
+          socket.emit('chat message', 'NEWNUMBER');
+        }
+
         $(function () {
-          var socket = io();
+          let socket = io();
           $('form').submit(function(e){
             e.preventDefault(); // prevents page reloading
             socket.emit('chat message', $('#m').val());
             $('#m').val('');
             return false;
           });
+          
           socket.on('chat message', function(msg){
-            $('#messages').append($('<li>').text(msg));
+            if (msg.charAt(0) == "{" && msg.charAt(1) == '"') {
+              mass = JSON.parse(msg);
+              addBoardToScreen(mass);
+            } else if (msg.charAt(0) == "N" && msg.charAt(1) == 'E' && msg.charAt(2) == 'W' && msg.charAt(8) == 'R') {
+              let len = msg.length;
+              let numberFromMsg = '';
+              for (let p = 9; p < len; p++) {
+                numberFromMsg += msg.charAt(p);         
+              }
+              points[points.length] = numberFromMsg;
+              $("#allNumber").html(points + " ");
+              // console.log(points);
+            } else {
+              $('#messages').append($('<li>').text(msg));
+            }
+            
           });
         });
-      let mass =  {'b': [1,2,3,4,5], 'i': [16,17,18,19,20], 'n': [31,32,"FREE",34,35], 'g': [46,47,48,49,50], 'o': [61,62,63,64,65]};
+      let points = [];
+      let mass =  {'b': [0,0,0,0,0], 'i': [0,0,0,0,0], 'n': [0,0,"FREE",0,0], 'g': [0,0,0,0,0], 'o': [0,0,0,0,0]};
       let b = mass['b'];
       let i = mass['i'];
       let n = mass['n'];
       let g = mass['g'];
       let o = mass['o'];
+      addBoardToScreen(mass);
 
-      for (let q = 0; q < 6; q++) {
+      function addBoardToScreen (mass) {
+
+        let b = mass['b'];
+        let i = mass['i'];
+        let n = mass['n'];
+        let g = mass['g'];
+        let o = mass['o'];
+        
+        for (let q = 0; q < 6; q++) {
         $(document).ready(function(){
           $("#b"+q).html(b[q]);
           $("#i"+q).html(i[q]);
@@ -55,6 +101,7 @@
           $("#o"+q).html(o[q]);
         });  
       }
+      }     
         
   </script>
   <body>
@@ -98,24 +145,31 @@
               </tr>
           </table>
       </div>
-        <button id="NewGame" style="  
-        background-color: #4CAF50;
-        border: none;
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;">New Game</button>
-        <button id="NewNumber" style="  
-        background-color: #008CBA;
-        border: none;
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;">New number</button>
+      <div style="height: 300px; width:150px; display:block; float:left;">
+          <button id="NewGame" class="btn" onclick='newGames()' style="  
+          background-color: #4CAF50;
+          border: none;
+          color: white;
+          padding: 15px 35px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;">New Game</button>
+          <button id="NewNumber" class="btn" onclick='newNumbers()' style="  
+          background-color: #008CBA;
+          border: none;
+          color: white;
+          padding: 15px 35px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;">New number</button>
+      </div>
+      <div id="allNumber" style="font-size: 20px; word-break:break-all;">
+
+      </div>
+
+
     </div>
     <h1>Write "BINGO" if all number in your card was called</h1>
     <ul id="messages"></ul>
