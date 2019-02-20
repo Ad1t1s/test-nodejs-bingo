@@ -4,7 +4,7 @@
     <title>Socket.IO chat</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
+      body { font: 13px Helvetica, Arial; padding-bottom: 50px; overflow:visible;}
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
@@ -34,21 +34,11 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
-    let divElement = function(){
-        divCode = document.getElementById(div1).innerHTML;
-        return divCode; };
-
-        function newGames() {
-          let socket = io();
-          socket.emit('chat message', 'NEWGAME');
-        }
-        function newNumbers() {
-          let socket = io();
-          socket.emit('chat message', 'NEWNUMBER');
-        }
-
-        $(function () {
-          let socket = io();
+      const divElement = () => $('#' + div1).html();
+      const newGames = () => io().emit('chat message', 'NEWGAME');
+      const newNumbers = () => io().emit('chat message', 'NEWNUMBER');
+      $(function () {
+          const socket = io();
           $('form').submit(function(e){
             e.preventDefault(); // prevents page reloading
             socket.emit('chat message', $('#m').val());
@@ -57,51 +47,36 @@
           });
           
           socket.on('chat message', function(msg){
-            if (msg.charAt(0) == "{" && msg.charAt(1) == '"') {
-              mass = JSON.parse(msg);
+            try {
+              console.log(msg)
+              mass = JSON.parse(msg)
               addBoardToScreen(mass);
-            } else if (msg.charAt(0) == "N" && msg.charAt(1) == 'E' && msg.charAt(2) == 'W' && msg.charAt(8) == 'R') {
-              let len = msg.length;
-              let numberFromMsg = '';
-              for (let p = 9; p < len; p++) {
-                numberFromMsg += msg.charAt(p);         
+              points = [];
+              $("#allNumber").html("");
+            } catch(e) {
+              if (msg.startsWith('NEWNUMBER')) {
+                points.push(parseInt(msg.slice(9)));
+                $("#allNumber").html(points.join(', '));
+              } else {
+                $('#messages').append($('<li>').text(msg));
+                window.scrollTo(0,document.body.scrollHeight);
               }
-              points[points.length] = numberFromMsg;
-              $("#allNumber").html(points + " ");
-              // console.log(points);
-            } else {
-              $('#messages').append($('<li>').text(msg));
             }
-            
+    
           });
         });
       let points = [];
-      let mass =  {'b': [0,0,0,0,0], 'i': [0,0,0,0,0], 'n': [0,0,"FREE",0,0], 'g': [0,0,0,0,0], 'o': [0,0,0,0,0]};
-      let b = mass['b'];
-      let i = mass['i'];
-      let n = mass['n'];
-      let g = mass['g'];
-      let o = mass['o'];
-      addBoardToScreen(mass);
+      let mass = Array(5).fill(false).map(() => [0,0,0,0,0]);
+      mass[2][2] = 'FREE';
+
+      addBoardToScreen(mass,points);
 
       function addBoardToScreen (mass) {
-
-        let b = mass['b'];
-        let i = mass['i'];
-        let n = mass['n'];
-        let g = mass['g'];
-        let o = mass['o'];
         
-        for (let q = 0; q < 6; q++) {
         $(document).ready(function(){
-          $("#b"+q).html(b[q]);
-          $("#i"+q).html(i[q]);
-          $("#n"+q).html(n[q]);
-          $("#g"+q).html(g[q]);
-          $("#o"+q).html(o[q]);
-        });  
+          mass.forEach((col, colIdx) => col.forEach((row, idx) => $(`#${'bingo'[colIdx]}${idx}`).html(row))  )
+        });
       }
-      }     
         
   </script>
   <body>

@@ -4,6 +4,7 @@
   "description": "bingo-app",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -12,5 +13,10 @@
     "express": "^4.16.4",
     "nodemon": "^1.18.10",
     "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.14.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0"
   }
 }
