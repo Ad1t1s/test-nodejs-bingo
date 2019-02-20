@@ -48,7 +48,6 @@
           
           socket.on('chat message', function(msg){
             try {
-              console.log(msg)
               mass = JSON.parse(msg)
               addBoardToScreen(mass);
               points = [];

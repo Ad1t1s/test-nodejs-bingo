@@ -29,14 +29,12 @@ io.on('connection', function(socket){
 			column = StartNewGame(lowerBound,upperBound);
 			userBoard = RandomBoard();
 			io.emit('chat message', JSON.stringify(userBoard) );
-			// console.log(userBoard);
 		} else if (msg === 'NEWNUMBER') {
 			if (column.length) {
 				// for (let v = 0; v < 75; v++) {
 				const barrelWithNumber = getNewNumber(column);
 				io.emit('chat message', 'NEWNUMBER' + barrelWithNumber.toString() );
 				AllBarrelWithNumber[AllBarrelWithNumber.length] = barrelWithNumber;
-				// console.log(AllBarrelWithNumber);
 				// }
 			}
 
@@ -45,7 +43,6 @@ io.on('connection', function(socket){
 				io.emit('chat message', 'CONGRATULATIONS YOU WON THE GAME!!!' );
 			} else { io.emit('chat message', 'YOU NOT WIN YET' );}
 		} else {
-			// console.log(msg);
 			let TimeForChat = TimeInChat();
 			io.emit('chat message', TimeForChat+ '  ' + msg );
 		}
